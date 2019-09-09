@@ -1,5 +1,5 @@
 """
-TODO: description
+TODO: The Entity library
 
 """
 
@@ -16,14 +16,12 @@ class Entity(object):
     def __init__(self):
         pass
 
-    def reprJSON(self):
-        return vars(self)
 
-    def printJSON(self):
-        print(json.dumps(self, cls=utils.ComplexEncoder, sort_keys=True, indent=4))
+    def json(self):
+        """ Print a JSON representatoin of the Entity"""
+        print(json.dumps(utils.todict(self), sort_keys=True, indent=4))
 
-    def __repr__(self):
-        return vars(self)
+
 
 
 

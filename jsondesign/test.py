@@ -7,7 +7,7 @@ weight =  entity.Numeric('integer')
 barcode = entity.String()
 features = {'weight': weight,'barcode': barcode }
 e.setFeature(features)
-e.printJSON()
+e.json()
 
 
 
