@@ -4,7 +4,6 @@ TODO: The Entity library
 """
 
 import json
-import utils
 
 SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 BASE_URI = 'http://las.ircc.it/schemas/'
@@ -13,76 +12,68 @@ BASE_URI = 'http://las.ircc.it/schemas/'
 
 class Entity(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, type):
+        self.schema = dict()
+        self.set_type(type)
+
+
+    def set_type(self, type):
+        self.schema['type'] = type
 
 
     def json(self):
         """ Print a JSON representatoin of the Entity"""
-        print(json.dumps(utils.todict(self), sort_keys=True, indent=4))
-
+        print(json.dumps(self.schema, sort_keys=True, indent=4))
 
 
 
 
 class Object(Entity):
     """
-    Pythonic representation of a data entity
+    Pythonic representation of a Complex Object
     """
 
     def __init__(self, title):
-        self.type = "object"
-        self.schema = SCHEMA_VERSION
-        self.id = BASE_URI + title
-        self.title = title
-        self.properties = {'features': dict()}
+        super().__init__('object')
+        s = self.schema
+        s['$schema'] = SCHEMA_VERSION
+        s['$id'] = BASE_URI + title
+        s['title'] = title
+        s['properties'] = {'features': dict()}       
 
 
 
-    # def __repr__(self):
-    #     return f"<Pythonic Object representation of a {self.id})>"
+    def __repr__(self):
+         return f"<Pythonic Object representation of a {self.schema['title']})>"
 
 
     def setFeature(self, features):
             for key, value in features.items():
-                self.properties['features'][key] = value
+                self.schema['properties']['features'][key] = value.schema
     
 
+ 
 
 
-class SimpleDataType(Entity):
-    """
-    Built-in feature class
-    """
-
-    def __init__(self, type):
-        self.type = type
-
-    def enum(self):
-        pass
-
-    
-
-
-class String(SimpleDataType):
+class String(Entity):
 
     def __init__(self):
         super().__init__("string")
 
     def setMinLength(self, minLength):
-        self.minLength = minLength
+        self.schema['minLength'] = minLength
 
     def setMaxLength(self, maxLength):
-        self.maxLength = maxLength
+        self.schema['maxLength'] = maxLength
 
     def setRegex(self, pattern):
-        self.pattern = pattern
+        self.schema['pattern'] = pattern
 
     def setFormat(self):
         pass
 
 
-class Numeric(SimpleDataType):
+class Numeric(Entity):
 
     def __init__(self, numeric_type):
         if numeric_type in ['integer', 'number']:
@@ -91,22 +82,22 @@ class Numeric(SimpleDataType):
             raise Exception('Numeric type must be integer or number')
 
     def setMultipleOf(self, multipleOf):
-        self.multipleOf = multipleOf
+        self.schema['multipleOf'] = multipleOf
 
     def setMinimum(self, minimum, exclusive = False):
         if exclusive: # X > k
-            self.exclusiveMinimum = minimum
+            self.schema['exclusiveMinimum'] = minimum
         else: # X >= k
-            self.minimum = minimum
+            self.schema['minimum'] = minimum
     
     def setMaximum(self, maximum, exclusive = False):
         if exclusive: # X > k
-            self.exclusiveMaximum = maximum
+            self.schema['exclusiveMaximum'] = maximum
         else: # X >= k
-            self.maximum = maximum
+            self.schema['maximum'] = maximum
 
 
-class Array(SimpleDataType):
+class Array(Entity):
 
     def __init__(self):
         super().__init__("array")
@@ -115,19 +106,19 @@ class Array(SimpleDataType):
         pass
 
     def setMinItems(self, minItems):
-        self.minItems = minItems
+        self.schema['minItems'] = minItems
 
     def setMaxItems(self, maxItems):
-        self.maxItems = maxItems
+        self.schema['maxItems'] = maxItems
 
 
-class Boolean(SimpleDataType):
+class Boolean(Entity):
 
     def __init__(self):
         super().__init__("boolean")
 
 
-class Null(SimpleDataType):
+class Null(Entity):
     
     def __init__(self):
         super().__init__("null")
