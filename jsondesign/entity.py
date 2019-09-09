@@ -49,7 +49,13 @@ class Object(Entity):
 
     def setFeature(self, features):
             for key, value in features.items():
-                self.schema['properties']['features'][key] = value.schema
+                if value == Object:
+                    # search the object in the store
+                    self.store.get(value.schema['$id'])
+                    print('got it!')
+                    pass
+                else:
+                    self.schema['properties']['features'][key] = value.schema
     
 
  

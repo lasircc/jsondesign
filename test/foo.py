@@ -32,7 +32,8 @@ def qal_uri_handler(uri):
                 "$ref": "#/definitions/Resource"
             },
             "type": "array"
-        }
+        },
+        "ciao": {"$ref": "#/definitions/Resource"}
     },
     "required": [
         "resources"
@@ -70,21 +71,3 @@ _resolver = RefResolver(base_uri="",
                         handlers={"qal":qal_uri_handler}, referrer=None, cache_remote=False)
 jsonschema.validators.Draft4Validator(schema=_test_schema, resolver=_resolver).validate(_test_data) 
 
-
-
-class Rectangle:
-    def __init__(self, length, width):
-        self.length = length
-        self.width = width
-
-    def area(self):
-        return self.length * self.width
-
-    def perimeter(self):
-        return 2 * self.length + 2 * self.width
-
-# Here we declare that the Square class inherits from the Rectangle class
-class Square(Rectangle):
-    def __init__(self, length):
-        self.length = length
-        self.width = length
