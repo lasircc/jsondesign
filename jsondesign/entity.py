@@ -6,7 +6,7 @@ TODO: The Entity library
 import json
 
 SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
-BASE_URI = 'http://las.ircc.it/schemas/'
+BASE_URI = 'las://schema/'
 
 
 
@@ -55,6 +55,7 @@ class Object(Entity):
                 else:
                     self.schema['properties']['features'][key] = value.schema
 
+
     def dereference(self, schema_store):
         """
         dereference the object against a schema_store and update its schema representation
@@ -83,6 +84,8 @@ class String(Entity):
         pass
 
 
+
+
 class Numeric(Entity):
 
     def __init__(self, numeric_type):
@@ -107,6 +110,8 @@ class Numeric(Entity):
             self.schema['maximum'] = maximum
 
 
+
+
 class Array(Entity):
 
     def __init__(self):
@@ -122,10 +127,14 @@ class Array(Entity):
         self.schema['maxItems'] = maxItems
 
 
+
+
 class Boolean(Entity):
 
     def __init__(self):
         super().__init__(type = "boolean")
+
+
 
 
 class Null(Entity):
