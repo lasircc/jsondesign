@@ -10,6 +10,7 @@ def qal_uri_handler(uri):
                 "base_path": {
                     "type": "string"
                 },
+                
                 "caption": {
                     "type": "string"
                 },

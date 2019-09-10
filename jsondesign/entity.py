@@ -12,14 +12,12 @@ BASE_URI = 'http://las.ircc.it/schemas/'
 
 class Entity(object):
 
-    def __init__(self, type):
-        self.schema = dict()
+    def __init__(self, schema = None, type = None):
+        self.schema = schema or dict()
         self.set_type(type)
-
 
     def set_type(self, type):
         self.schema['type'] = type
-
 
     def json(self):
         """ Print a JSON representatoin of the Entity"""
@@ -33,13 +31,16 @@ class Object(Entity):
     Pythonic representation of a Complex Object
     """
 
-    def __init__(self, title):
-        super().__init__('object')
-        s = self.schema
-        s['$schema'] = SCHEMA_VERSION
-        s['$id'] = BASE_URI + title
-        s['title'] = title
-        s['properties'] = {'features': dict()}       
+    def __init__(self, schema = None, title = None):
+        if schema:
+            super().__init__(schema = schema)
+        else:
+            super().__init__(type = 'object')
+            s = self.schema
+            s['$schema'] = SCHEMA_VERSION
+            s['$id'] = BASE_URI + title
+            s['title'] = title
+            s['properties'] = {'features': dict()}       
 
 
 
@@ -49,13 +50,16 @@ class Object(Entity):
 
     def setFeature(self, features):
             for key, value in features.items():
-                if value == Object:
-                    # search the object in the store
-                    self.store.get(value.schema['$id'])
-                    print('got it!')
-                    pass
+                if type(value) == dict:
+                    self.schema['properties']['features'][key] = value
                 else:
                     self.schema['properties']['features'][key] = value.schema
+
+    def dereference(self, schema_store):
+        """
+        dereference the object against a schema_store and update its schema representation
+        """
+        self.schema = schema_store.resolve(self.schema)
     
 
  
@@ -64,7 +68,7 @@ class Object(Entity):
 class String(Entity):
 
     def __init__(self):
-        super().__init__("string")
+        super().__init__(type = "string")
 
     def setMinLength(self, minLength):
         self.schema['minLength'] = minLength
@@ -83,7 +87,7 @@ class Numeric(Entity):
 
     def __init__(self, numeric_type):
         if numeric_type in ['integer', 'number']:
-            super().__init__(numeric_type)
+            super().__init__(type = numeric_type)
         else:
             raise Exception('Numeric type must be integer or number')
 
@@ -106,7 +110,7 @@ class Numeric(Entity):
 class Array(Entity):
 
     def __init__(self):
-        super().__init__("array")
+        super().__init__(type = "array")
 
     def setItemsConstraint(self, constraint):
         pass
@@ -121,11 +125,11 @@ class Array(Entity):
 class Boolean(Entity):
 
     def __init__(self):
-        super().__init__("boolean")
+        super().__init__(type = "boolean")
 
 
 class Null(Entity):
     
     def __init__(self):
-        super().__init__("null")
+        super().__init__(type = "null")
 
