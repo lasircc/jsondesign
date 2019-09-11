@@ -7,8 +7,7 @@ verify_ssl = true
 pylint = "*"
 ipython = "*"
 pytest = "==5.0.1"
-jsondesign = {path = ".",editable = true}
-pytest-name = "*"
+jsondesign = {editable = true, path = "."}
 
 [packages]
 jsonschema = "*"
