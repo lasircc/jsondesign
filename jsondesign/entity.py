@@ -6,7 +6,6 @@ TODO: The Entity library
 import json
 
 SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
-BASE_URI = 'las://schema/'
 
 
 
@@ -31,21 +30,20 @@ class Object(Entity):
     Pythonic representation of a Complex Object
     """
 
-    def __init__(self, schema = None, title = None):
+    def __init__(self, schema = None, uri = None):
         if schema:
-            super().__init__(schema = schema)
+            super().__init__(schema = schema, type = 'object')
         else:
             super().__init__(type = 'object')
             s = self.schema
             s['$schema'] = SCHEMA_VERSION
-            s['$id'] = BASE_URI + title
-            s['title'] = title
+            s['$id'] = uri
             s['properties'] = {'features': dict()}       
 
 
 
     def __repr__(self):
-         return f"<Pythonic Object representation of a {self.schema['title']})>"
+         return f"<Pythonic Object representation of {self.schema['$id']})>"
 
 
     def setFeature(self, features):

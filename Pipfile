@@ -8,6 +8,7 @@ pylint = "*"
 ipython = "*"
 pytest = "==5.0.1"
 jsondesign = {editable = true, path = "."}
+"autopep8" = "*"
 
 [packages]
 jsonschema = "*"

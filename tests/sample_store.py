@@ -1,41 +1,45 @@
-SCHEMA = { 
+SCHEMA = [
 
-'las://recording.json' : {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Schema for a recording",
-  "type": "object",
-  "properties": {
-    "id": {"type": "number"},
-    "work": {
-      "type": "object",
-      "properties": {
-        "id": {"type": "number"},
-        "name": {"type": "string"},
-        "composer": {"$ref": "las://artist.json"}
-      }
-    },
-
-    "recording_artists": {
-      "type": "array",
-      "items": {"$ref": "las://artist.json"}
-    }
-  },
-  "required": ["id", "work", "recording_artists"]
-},
-
-'las://artist.json' : {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Schema for an artist",
-    "type": "object",
-    "properties": {
-        "id": {"type": "number"},
-        "name": {"type": "string"},
-        "functions": {
-        "type": "array",
-        "items": {"type": "string"}
+    {
+        "$id": "las://schema/car",
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+            "engine": {"$ref": "las://schema/engine"},
+            "color": {"type": "string"},
+            "manufacturer": {"$ref": "las://schema/manufacturer"}
         }
     },
-    "required": ["id", "name", "functions"]
-    }
 
-}
+    {
+        "$id": "las://schema/engine",
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+            "color": {"type": "string"},
+            "manufacturer": {"$ref": "las://schema/manufacturer"},
+        }
+    },
+    {
+        "$id": "las://schema/manufacturer",
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "vat_number": {"type": "string"}
+        }
+    },
+    {
+        "$id": "foo",
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        'foo_bar': 5,
+        'foo_baz': [1, 2, True]
+    },
+    {
+        "$id": "bar",
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        'bar_baz': 4
+    }
+]
