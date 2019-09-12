@@ -8,7 +8,6 @@ python:
 install:
   - pip install pipenv
   - pipenv install --dev
-  - pip install pytest-cov
 
 # command to run tests
 script:

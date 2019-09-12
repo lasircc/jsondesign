@@ -10,6 +10,7 @@ pytest = "==5.0.1"
 jsondesign = {path = ".",editable = true}
 "autopep8" = "*"
 pytest-cov = "*"
+coveralls = "*"
 
 [packages]
 jsonschema = "*"
