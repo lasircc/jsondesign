@@ -7,8 +7,9 @@ verify_ssl = true
 pylint = "*"
 ipython = "*"
 pytest = "==5.0.1"
-jsondesign = {editable = true, path = "."}
+jsondesign = {path = ".",editable = true}
 "autopep8" = "*"
+pytest-cov = "*"
 
 [packages]
 jsonschema = "*"
