@@ -48,7 +48,7 @@ class Object(Entity):
 
     def setFeature(self, features):
             for key, value in features.items():
-                if type(value) == dict:
+                if type(value) == ObjectReference:
                     self.schema['properties']['features'][key] = value
                 else:
                     self.schema['properties']['features'][key] = value.schema
@@ -59,9 +59,42 @@ class Object(Entity):
         dereference the object against a schema_store and update its schema representation
         """
         self.schema = schema_store.resolve(self.schema)
-    
+
+
+    def extend(self, objRef):
+        """
+        Extend the current schema
+
+        See https://github.com/json-schema-org/json-schema-spec/issues/348#issuecomment-322940347 for inheritance limitations
+        """
+
+        try:
+            self.schema['allOf']
+        except KeyError:
+            self.schema['allOf'] = list()
+        
+        extensions = self.schema['allOf']
+
+        if type(objRef) != ObjectReference:
+            raise Exception('function arguments must be an instance of jsondesign.entity.ObjectReference')
+        extensions.append(objRef)
+        
+        # remove duplicates
+        self.schema['allOf'] = list(set(self.schema['allOf']))
 
  
+
+
+class ObjectReference(dict):
+    """ Just a reference to an object"""
+
+    def __init__(self, uri, *args, **kwargs):
+        super().__init__({'$ref' : uri}, *args, **kwargs)
+
+    def __hash__(self):
+        return hash(self['$ref'])
+
+
 
 
 class String(Entity):

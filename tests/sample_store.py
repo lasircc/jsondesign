@@ -5,9 +5,13 @@ SCHEMA = [
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
         "properties": {
-            "engine": {"$ref": "las://schema/engine"},
-            "color": {"type": "string"},
-            "manufacturer": {"$ref": "las://schema/manufacturer"}
+            'features': {
+                "type": "object",
+                "engine": {"$ref": "las://schema/engine"},
+                "color": {"type": "string"},
+                "manufacturer": {"$ref": "las://schema/manufacturer"}
+            }
+
         }
     },
 
@@ -16,8 +20,11 @@ SCHEMA = [
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
         "properties": {
-            "color": {"type": "string"},
-            "manufacturer": {"$ref": "las://schema/manufacturer"},
+            'features': {
+                "type": "object",
+                "color": {"type": "string"},
+                "manufacturer": {"$ref": "las://schema/manufacturer"},
+            }
         }
     },
     {
@@ -25,8 +32,11 @@ SCHEMA = [
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
         "properties": {
-            "name": {"type": "string"},
-            "vat_number": {"type": "string"}
+            'features': {
+                "type": "object",
+                "name": {"type": "string"},
+                "vat_number": {"type": "string"}
+            }
         }
     },
     {
@@ -43,3 +53,4 @@ SCHEMA = [
         'bar_baz': 4
     }
 ]
+
