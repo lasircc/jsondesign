@@ -1,6 +1,6 @@
 import jsondesign.schema_store
 import pytest
-from sample_store import SCHEMA
+from sample_data import SCHEMA
 
 
 @pytest.fixture(scope='session')  

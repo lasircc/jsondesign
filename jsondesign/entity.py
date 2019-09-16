@@ -9,9 +9,10 @@ SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
 
 
+
 class Entity(object):
 
-    def __init__(self, schema = None, type = None):
+    def __init__(self, schema=None, type=None):
         self.schema = schema or dict()
         self.set_type(type)
 
@@ -30,29 +31,53 @@ class Object(Entity):
     Pythonic representation of a Complex Object
     """
 
-    def __init__(self, schema = None, uri = None):
+
+    def __init__(self, schema=None, uri=None):
         if schema:
-            super().__init__(schema = schema, type = 'object')
+            super().__init__(schema=schema, type='object')
         else:
-            super().__init__(type = 'object')
+            super().__init__(type='object')
             s = self.schema
             s['$schema'] = SCHEMA_VERSION
             s['$id'] = uri
-            s['properties'] = {'features': dict()}       
-
+            s['allOf'] = list()
+            object_properties = {
+                "properties": {
+                    'features': {
+                        "type": "object",
+                        "properties": {},
+                        "required": []
+                    }
+                }
+            }
+            s['allOf'].append(object_properties)
 
 
     def __repr__(self):
-         return f"<Pythonic Object representation of {self.schema['$id']})>"
+        return f"<Pythonic Object representation of {self.schema['$id']})>"
 
 
-    def setFeature(self, features):
-            for key, value in features.items():
-                if type(value) == ObjectReference:
-                    self.schema['properties']['features'][key] = value
-                else:
-                    self.schema['properties']['features'][key] = value.schema
+    def set_feature(self, features):
+        for key, value in features.items():
+            if type(value) == ObjectReference:
+                new_data = value
+            else:
+                new_data = value.schema
 
+            self.schema['allOf'][0]['properties']['features']['properties'][key] = new_data
+
+
+    def add_required_features(self, *args):
+
+        required = self.schema['allOf'][0]['properties']['features']['required']
+        
+        if args:
+            for f in args:
+                required.append(f)
+
+        # remove duplicates
+        self.schema['allOf'][0]['properties']['features']['required'] = sorted(list(set(required)))
+        
 
     def dereference(self, schema_store):
         """
@@ -61,35 +86,33 @@ class Object(Entity):
         self.schema = schema_store.resolve(self.schema)
 
 
-    def extend(self, objRef):
+    def extend(self, *args):
         """
         Extend the current schema
 
         See https://github.com/json-schema-org/json-schema-spec/issues/348#issuecomment-322940347 for inheritance limitations
         """
 
-        try:
-            self.schema['allOf']
-        except KeyError:
-            self.schema['allOf'] = list()
-        
         extensions = self.schema['allOf']
 
-        if type(objRef) != ObjectReference:
-            raise Exception('function arguments must be an instance of jsondesign.entity.ObjectReference')
-        extensions.append(objRef)
-        
-        # remove duplicates
-        self.schema['allOf'] = list(set(self.schema['allOf']))
+        for objRef in args:
 
- 
+            if type(objRef) != ObjectReference:
+                raise Exception('function arguments must be an instance of jsondesign.entity.ObjectReference')
+        
+            extensions.append(objRef)
+
+        # remove duplicates and update
+        self.schema['allOf'] = [self.schema['allOf'][0]] + list(set(extensions))
+
+
 
 
 class ObjectReference(dict):
     """ Just a reference to an object"""
 
     def __init__(self, uri, *args, **kwargs):
-        super().__init__({'$ref' : uri}, *args, **kwargs)
+        super().__init__({'$ref': uri}, *args, **kwargs)
 
     def __hash__(self):
         return hash(self['$ref'])
@@ -100,15 +123,15 @@ class ObjectReference(dict):
 class String(Entity):
 
     def __init__(self):
-        super().__init__(type = "string")
+        super().__init__(type="string")
 
-    def setMinLength(self, minLength):
+    def set_minLength(self, minLength):
         self.schema['minLength'] = minLength
 
-    def setMaxLength(self, maxLength):
+    def set_maxLength(self, maxLength):
         self.schema['maxLength'] = maxLength
 
-    def setRegex(self, pattern):
+    def set_regex(self, pattern):
         self.schema['pattern'] = pattern
 
     def setFormat(self):
@@ -121,23 +144,23 @@ class Numeric(Entity):
 
     def __init__(self, numeric_type):
         if numeric_type in ['integer', 'number']:
-            super().__init__(type = numeric_type)
+            super().__init__(type=numeric_type)
         else:
             raise Exception('Numeric type must be integer or number')
 
-    def setMultipleOf(self, multipleOf):
+    def set_multipleOf(self, multipleOf):
         self.schema['multipleOf'] = multipleOf
 
-    def setMinimum(self, minimum, exclusive = False):
-        if exclusive: # X > k
+    def set_minimum(self, minimum, exclusive=False):
+        if exclusive:  # X > k
             self.schema['exclusiveMinimum'] = minimum
-        else: # X >= k
+        else:  # X >= k
             self.schema['minimum'] = minimum
-    
-    def setMaximum(self, maximum, exclusive = False):
-        if exclusive: # X > k
+
+    def set_maximum(self, maximum, exclusive=False):
+        if exclusive:  # X > k
             self.schema['exclusiveMaximum'] = maximum
-        else: # X >= k
+        else:  # X >= k
             self.schema['maximum'] = maximum
 
 
@@ -146,15 +169,15 @@ class Numeric(Entity):
 class Array(Entity):
 
     def __init__(self):
-        super().__init__(type = "array")
+        super().__init__(type="array")
 
     def setItemsConstraint(self, constraint):
         pass
 
-    def setMinItems(self, minItems):
+    def set_minItems(self, minItems):
         self.schema['minItems'] = minItems
 
-    def setMaxItems(self, maxItems):
+    def set_maxItems(self, maxItems):
         self.schema['maxItems'] = maxItems
 
 
@@ -163,13 +186,12 @@ class Array(Entity):
 class Boolean(Entity):
 
     def __init__(self):
-        super().__init__(type = "boolean")
+        super().__init__(type="boolean")
 
 
 
 
 class Null(Entity):
-    
-    def __init__(self):
-        super().__init__(type = "null")
 
+    def __init__(self):
+        super().__init__(type="null")
