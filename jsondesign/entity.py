@@ -93,7 +93,8 @@ class Object(Entity):
         See https://github.com/json-schema-org/json-schema-spec/issues/348#issuecomment-322940347 for inheritance limitations
         """
 
-        extensions = self.schema['allOf']
+        # Extension are stored in the list stored in the key allOf (from index 1 onwards)
+        extensions = self.schema['allOf'][1:]
 
         for objRef in args:
 

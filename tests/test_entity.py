@@ -6,7 +6,6 @@ def test_create_object():
     """
     Create an object representation of an Address
     """
-    
     e = ey.Object(uri='las://schema/address')
     simple_string = ey.String()
     features = {'street_address': simple_string, 'city': simple_string, 'state': simple_string}
@@ -28,7 +27,6 @@ def test_create_reference():
     """
     Create a reference as an extension of a Python dict
     """
-
     r = ey.ObjectReference('las://schema/foo')
     assert r == {'$ref': 'las://schema/foo'}
 
@@ -39,7 +37,6 @@ def test_append_reference():
     """
     Create a reference and append it to an object
     """
-
     e = ey.Object(uri='las://schema/person')
     simple_string = ey.String()
     address = ey.ObjectReference('las://schema/address')
@@ -51,6 +48,25 @@ def test_append_reference():
     assert e.schema == next(item for item in SCHEMA if item["$id"] == 'las://schema/person')
     print('>>>>> ok!')
 
+
+
+
+def test_extend_entity():
+    """
+    Create a Student schema extending person schema (i.e., inhertiance)
+    """
+    student = ey.Object(uri='las://schema/student')
+    student_id = ey.String()
+    features = {'student_id': student_id}
+    student.set_feature(features)
+    student.add_required_features('student_id')
+    # Inheritance
+    r = ey.ObjectReference('las://schema/person')
+    student.extend(r)
+    # Redundant inheritance. entity.extend() is protected against this kind of redundancy
+    student.extend(r)
+    assert student.schema == next(item for item in SCHEMA if item["$id"] == 'las://schema/student')
+    print (student.schema)
 
 
 
