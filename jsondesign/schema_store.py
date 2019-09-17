@@ -17,7 +17,7 @@ class Schema_Store(object):
 
     def get_object(self, uri, **kwargs):
         """ Return an entity.Object quering the store with the given uri"""
-        return entity.Object(schema = self.get_schema(uri), uri = uri)
+        return entity.Object(schema = self.get_schema(uri))
 
     def resolve(self, schema, **kwargs):
         result = jsonref.JsonRef.replace_refs(schema, loader=self.get_schema)

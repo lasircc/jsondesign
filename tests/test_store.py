@@ -2,11 +2,13 @@
 
 
 def test_get_object(schema_store):
-    print('>>>>> testing object retrieval')
+    """
+    testing object retrieval
+    """ 
 
     #  get_object() returns an entity.Object
     address = schema_store.get_object('las://schema/address')
-    
+   
     assert address.schema == {
         "$id": "las://schema/address",
         "$schema": "http://json-schema.org/draft-07/schema#",
@@ -27,4 +29,4 @@ def test_get_object(schema_store):
             }
         ]
     }
-    print('>>>>> ok')
+    

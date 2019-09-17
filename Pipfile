@@ -11,6 +11,9 @@ jsondesign = {path = ".",editable = true}
 "autopep8" = "*"
 pytest-cov = "*"
 coveralls = "*"
+pipenv-setup = "*"
+bumpversion = "*"
+twine = "*"
 
 [packages]
 jsonschema = "*"
