@@ -8,8 +8,9 @@ from . import entity
 
 class Schema_Store(object):
 
-    def __init__(self, getter):
+    def __init__(self, getter, saver):
         self.getter = getter
+        self.saver = saver
 
     def get_schema(self, uri, **kwargs):
         """ Return a schema quering the store with the given uri"""
@@ -22,3 +23,6 @@ class Schema_Store(object):
     def resolve(self, schema, **kwargs):
         result = jsonref.JsonRef.replace_refs(schema, loader=self.get_schema)
         return result
+
+    def save(self, entity, **kwargs):
+        return self.saver(entity.schema)

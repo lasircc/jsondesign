@@ -21,7 +21,7 @@ schema_store = Schema_Store(getter = custom_retrieval_function)
 o = Object(uri='las://schema/address')
 simple_string =String()
 features = {'street_address': simple_string, 'city': simple_string, 'state': simple_string}
-o.set_feature(features)
+o.set_feature(**features)
 
 o.add_required_features('street_address')
 # entity.add_required_features prevents duplicates

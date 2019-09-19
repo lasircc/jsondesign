@@ -1,4 +1,4 @@
-
+import jsondesign.entity as ey
 
 
 def test_get_object(schema_store):
@@ -30,3 +30,24 @@ def test_get_object(schema_store):
         ]
     }
     
+
+
+def test_save_object(schema_store):
+
+    e = ey.Object(uri='las://schema/address_foo')
+    simple_string = ey.String()
+    features = {'street_address': simple_string,
+                'city': simple_string, 'state': simple_string}
+    e.set_feature(**features)
+
+    e.add_required_features('street_address')
+    # entity.add_required_features prevents duplicates
+    e.add_required_features('street_address', 'city', 'state')
+
+    schema_store.save(e)
+
+    # get the saved object from the store
+    address_foo = schema_store.get_object('las://schema/address_foo')
+
+    # compare with the one in memory
+    assert address_foo.schema == e.schema

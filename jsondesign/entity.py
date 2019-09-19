@@ -60,6 +60,16 @@ class Object(Entity):
         return f"<Pythonic Object representation of {self.schema['$id']})>"
 
 
+    def get_features(self):
+        """
+        Return objects features
+        """
+        features = dict()
+        for feature in self.schema['allOf'][0]['properties']['features']['properties']:
+            features[feature] = self.schema['allOf'][0]['properties']['features']['properties'][feature]
+        return features
+
+
     def set_feature(self, **kwargs):
         for key, value in kwargs.items():
             if type(value) == ObjectReference:
@@ -69,14 +79,31 @@ class Object(Entity):
 
             self.schema['allOf'][0]['properties']['features']['properties'][key] = new_data
 
+    
+    def remove_features(self, *args):
+
+        for f in args:
+            try:
+                del self.schema['allOf'][0]['properties']['features']['properties'][f]
+                self.remove_required_features(f)
+            except KeyError:
+                pass
+                #print(f'{f} is ignored since it is not a current feature of this object')
+
+
+    def get_required_features(self):
+        """
+        Return a list of required properties
+        """
+        return self.schema['allOf'][0]['properties']['features']['required']
+
 
     def add_required_features(self, *args):
 
         required = self.schema['allOf'][0]['properties']['features']['required']
         
-        if args:
-            for f in args:
-                required.append(f)
+        for f in args:
+            required.append(f)
 
         # remove duplicates and sort
         self.schema['allOf'][0]['properties']['features']['required'] = sorted(list(set(required)))
@@ -91,7 +118,8 @@ class Object(Entity):
                 try:
                     required.remove(f)
                 except ValueError:
-                    print(f'{f} is ignored since it is not a current feature of this object')
+                    pass
+                    # print(f'{f} is ignored since it is not a current feature of this object')
 
         # sort
         self.schema['allOf'][0]['properties']['features']['required'] = sorted(required)
