@@ -69,6 +69,13 @@ class Object(Entity):
             features[feature] = self.schema['allOf'][0]['properties']['features']['properties'][feature]
         return features
 
+    def get_features_paths(self):
+
+        features_hierarchy = list()
+        dereferenced_schema = self.dereference()
+
+        return features_hierarchy
+
 
     def set_feature(self, **kwargs):
         for key, value in kwargs.items():
@@ -127,9 +134,9 @@ class Object(Entity):
 
     def dereference(self, schema_store):
         """
-        dereference the object against a schema_store and update its schema representation
+        dereference the object against a schema_store and return its schema representation
         """
-        self.schema = schema_store.resolve(self.schema)
+        return schema_store.resolve(self.schema)
 
 
     def extend(self, *args):

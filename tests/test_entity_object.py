@@ -61,9 +61,9 @@ def test_dereference(schema_store):
     """
 
     student = schema_store.get_object('las://schema/student')
-    student.dereference(schema_store)
+    dereferenced_schema = student.dereference(schema_store)
     # Match the creaded object against a dereferenced target schema (i.e., las://schema/address)
-    assert student.schema == next(
+    assert dereferenced_schema == next(
         item for item in DEREFERENCED_SCHEMA if item["$id"] == 'las://schema/student')
 
 
