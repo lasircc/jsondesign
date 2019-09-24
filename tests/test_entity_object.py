@@ -104,9 +104,10 @@ def test_remove_feature(schema_store):
                               '$schema': 'http://json-schema.org/draft-07/schema#',
                               'type': 'object',
                               'allOf': [{'properties': {'features': {'type': 'object',
-                                                                     'properties': {'street_address': {'type': 'string'},
-                                                                                    'state': {'type': 'string'}},
-                                                                     'required': ['state', 'street_address']}}}]}
+                                                                     "allOf": [{
+                                                                             'properties': {'street_address': {'type': 'string'},
+                                                                                            'state': {'type': 'string'}},
+                                                                             'required': ['state', 'street_address']}]}}}]}
 
 
 def test_remove_required_feature(schema_store):
@@ -122,7 +123,8 @@ def test_remove_required_feature(schema_store):
                               '$schema': 'http://json-schema.org/draft-07/schema#',
                               'type': 'object',
                               'allOf': [{'properties': {'features': {'type': 'object',
+                                                                    'allOf': [{
                                                                      'properties': {'street_address': {'type': 'string'},
                                                                                     'city': {'type': 'string'},
                                                                                     'state': {'type': 'string'}},
-                                                                     'required': ['state', 'street_address']}}}]}
+                                                                     'required': ['state', 'street_address']}]}}}]}

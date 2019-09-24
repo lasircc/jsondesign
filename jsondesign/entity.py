@@ -8,8 +8,6 @@ import json
 SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
 
-
-
 class Entity(object):
 
     def __init__(self, schema=None, type=None):
@@ -27,13 +25,10 @@ class Entity(object):
         print(json.dumps(self.schema, sort_keys=True, indent=4))
 
 
-
-
 class Object(Entity):
     """
     Pythonic representation of a Complex Object
     """
-
 
     def __init__(self, schema=None, uri=None):
         if schema:
@@ -48,25 +43,27 @@ class Object(Entity):
                 "properties": {
                     'features': {
                         "type": "object",
-                        "properties": {},
-                        "required": []
+                        "allOf": [
+                            {
+                                "properties": {},
+                                "required": []
+                            }
+                        ]
                     }
                 }
             }
             s['allOf'].append(object_properties)
 
-
     def __repr__(self):
         return f"<Pythonic Object representation of {self.schema['$id']})>"
-
 
     def get_features(self):
         """
         Return objects features
         """
         features = dict()
-        for feature in self.schema['allOf'][0]['properties']['features']['properties']:
-            features[feature] = self.schema['allOf'][0]['properties']['features']['properties'][feature]
+        for feature in self.schema['allOf'][0]['properties']['features']['allOf'][0]['properties']:
+            features[feature] = self.schema['allOf'][0]['properties']['features']['allOf'][0]['properties'][feature]
         return features
 
     def get_features_paths(self):
@@ -76,7 +73,6 @@ class Object(Entity):
 
         return features_hierarchy
 
-
     def set_feature(self, **kwargs):
         for key, value in kwargs.items():
             if type(value) == ObjectReference:
@@ -84,42 +80,39 @@ class Object(Entity):
             else:
                 new_data = value.schema
 
-            self.schema['allOf'][0]['properties']['features']['properties'][key] = new_data
+            self.schema['allOf'][0]['properties']['features']['allOf'][0]['properties'][key] = new_data
 
-    
     def remove_features(self, *args):
 
         for f in args:
             try:
-                del self.schema['allOf'][0]['properties']['features']['properties'][f]
+                del self.schema['allOf'][0]['properties']['features']['allOf'][0]['properties'][f]
                 self.remove_required_features(f)
             except KeyError:
                 pass
                 #print(f'{f} is ignored since it is not a current feature of this object')
 
-
     def get_required_features(self):
         """
         Return a list of required properties
         """
-        return self.schema['allOf'][0]['properties']['features']['required']
-
+        return self.schema['allOf'][0]['properties']['features']['allOf'][0]['required']
 
     def add_required_features(self, *args):
 
-        required = self.schema['allOf'][0]['properties']['features']['required']
-        
+        required = self.schema['allOf'][0]['properties']['features']['allOf'][0]['required']
+
         for f in args:
             required.append(f)
 
         # remove duplicates and sort
-        self.schema['allOf'][0]['properties']['features']['required'] = sorted(list(set(required)))
-
+        self.schema['allOf'][0]['properties']['features']['allOf'][0]['required'] = sorted(
+            list(set(required)))
 
     def remove_required_features(self, *args):
 
-        required = self.schema['allOf'][0]['properties']['features']['required']
-        
+        required = self.schema['allOf'][0]['properties']['features']['allOf'][0]['required']
+
         if args:
             for f in args:
                 try:
@@ -129,15 +122,14 @@ class Object(Entity):
                     # print(f'{f} is ignored since it is not a current feature of this object')
 
         # sort
-        self.schema['allOf'][0]['properties']['features']['required'] = sorted(required)
-
+        self.schema['allOf'][0]['properties']['features']['allOf'][0]['required'] = sorted(
+            required)
 
     def dereference(self, schema_store):
         """
         dereference the object against a schema_store and return its schema representation
         """
         return schema_store.resolve(self.schema)
-
 
     def extend(self, *args):
         """
@@ -152,58 +144,45 @@ class Object(Entity):
         for objRef in args:
 
             if type(objRef) != ObjectReference:
-                raise Exception('function arguments must be an instance of jsondesign.entity.ObjectReference')
-        
+                raise Exception(
+                    'function arguments must be an instance of jsondesign.entity.ObjectReference')
+
             extensions.append(objRef)
 
         # remove duplicates and update
-        self.schema['allOf'] = [self.schema['allOf'][0]] + list(set(extensions))
-
-
+        self.schema['allOf'] = [
+            self.schema['allOf'][0]] + list(set(extensions))
 
 
 class ObjectReference(dict):
     """ Just a reference to an object"""
 
-
     def __init__(self, uri, *args, **kwargs):
         super().__init__({'$ref': uri}, *args, **kwargs)
-
 
     def __hash__(self):
         return hash(self['$ref'])
 
 
-
-
 class String(Entity):
-
 
     def __init__(self):
         super().__init__(type="string")
 
-
     def set_minLength(self, minLength):
         self.schema['minLength'] = int(minLength)
-
 
     def set_maxLength(self, maxLength):
         self.schema['maxLength'] = int(maxLength)
 
-
     def set_regex(self, pattern):
         self.schema['pattern'] = pattern
-
-
 
     def setFormat(self):
         pass
 
 
-
-
 class Numeric(Entity):
-
 
     def __init__(self, numeric_type):
         if numeric_type in ['integer', 'number']:
@@ -211,17 +190,14 @@ class Numeric(Entity):
         else:
             raise Exception('Numeric type must be integer or number')
 
-
     def set_multipleOf(self, multipleOf):
         self.schema['multipleOf'] = multipleOf
-
 
     def set_minimum(self, minimum, exclusive=True):
         if exclusive:  # X > k
             self.schema['exclusiveMinimum'] = minimum
         else:  # X >= k
             self.schema['minimum'] = minimum
-
 
     def set_maximum(self, maximum, exclusive=True):
         if exclusive:  # X > k
@@ -230,14 +206,10 @@ class Numeric(Entity):
             self.schema['maximum'] = maximum
 
 
-
-
 class Array(Entity):
-
 
     def __init__(self):
         super().__init__(type="array")
-
 
     def set_ItemsType(self, item):
         if type(item) == ObjectReference:
@@ -247,7 +219,6 @@ class Array(Entity):
 
         self.schema['items'] = item_schema
 
-
     def set_minItems(self, minItems):
         self.schema['minItems'] = minItems
 
@@ -255,19 +226,13 @@ class Array(Entity):
         self.schema['maxItems'] = maxItems
 
 
-
-
 class Boolean(Entity):
-
 
     def __init__(self):
         super().__init__(type="boolean")
 
 
-
-
 class Null(Entity):
-
 
     def __init__(self):
         super().__init__(type="null")

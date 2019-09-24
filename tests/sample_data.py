@@ -9,12 +9,16 @@ SCHEMA = [
                 "properties": {
                     'features': {
                         "type": "object",
-                        "properties": {
-                            "firstName":    {"type": "string"},
-                            "lastName":     {"type": "string"},
-                            "address":      {"$ref": "las://schema/address"}
-                        },
-                        "required": ["firstName", "lastName"]
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "firstName":    {"type": "string"},
+                                    "lastName":     {"type": "string"},
+                                    "address":      {"$ref": "las://schema/address"}
+                                },
+                                "required": ["firstName", "lastName"]
+                            }
+                        ]
                     }
                 }
             }
@@ -29,10 +33,14 @@ SCHEMA = [
                 "properties": {
                     'features': {
                         "type": "object",
-                        "properties": {
-                            "student_id": {"type": "string"}
-                        },
-                        "required": ["student_id"]
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "student_id": {"type": "string"}
+                                },
+                                "required": ["student_id"]
+                            }
+                        ]
                     }
                 }
             },
@@ -48,10 +56,14 @@ SCHEMA = [
                 "properties": {
                     'features': {
                         "type": "object",
-                        "properties": {
-                            "faculty": {"type": "string"}
-                        },
-                        "required": ["faculty"]
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "faculty": {"type": "string"}
+                                },
+                                "required": ["faculty"]
+                            }
+                        ]
                     }
                 }
             },
@@ -67,12 +79,16 @@ SCHEMA = [
                 "properties": {
                     'features': {
                         "type": "object",
-                        "properties": {
-                            "street_address": {"type": "string"},
-                            "city":           {"type": "string"},
-                            "state":          {"type": "string"}
-                        },
-                        "required": ["city", "state", "street_address"]
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "street_address": {"type": "string"},
+                                    "city":           {"type": "string"},
+                                    "state":          {"type": "string"}
+                                },
+                                "required": ["city", "state", "street_address"]
+                            }
+                        ]
                     }
                 }
             }
@@ -160,13 +176,17 @@ DEREFERENCED_SCHEMA = [
                 "properties": {
                     "features": {
                         "type": "object",
-                        "properties": {
-                            "student_id": {
-                                "type": "string"
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "student_id": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "student_id"
+                                ]
                             }
-                        },
-                        "required": [
-                            "student_id"
                         ]
                     }
                 }
@@ -180,47 +200,55 @@ DEREFERENCED_SCHEMA = [
                         "properties": {
                             "features": {
                                 "type": "object",
-                                "properties": {
-                                    "firstName": {
-                                        "type": "string"
-                                    },
-                                    "lastName": {
-                                        "type": "string"
-                                    },
-                                    "address": {
-                                        "$id": "las://schema/address",
-                                        "$schema": "http://json-schema.org/draft-07/schema#",
-                                        "type": "object",
-                                        "allOf": [
-                                            {
-                                                "properties": {
-                                                    "features": {
-                                                        "type": "object",
+                                "allOf": [
+                                    {
+                                        "properties": {
+                                            "firstName": {
+                                                "type": "string"
+                                            },
+                                            "lastName": {
+                                                "type": "string"
+                                            },
+                                            "address": {
+                                                "$id": "las://schema/address",
+                                                "$schema": "http://json-schema.org/draft-07/schema#",
+                                                "type": "object",
+                                                "allOf": [
+                                                    {
                                                         "properties": {
-                                                            "street_address": {
-                                                                "type": "string"
-                                                            },
-                                                            "city": {
-                                                                "type": "string"
-                                                            },
-                                                            "state": {
-                                                                "type": "string"
+                                                            "features": {
+                                                                "type": "object",
+                                                                "allOf": [
+                                                                    {
+                                                                        "properties": {
+                                                                            "street_address": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "city": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "state": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "city",
+                                                                            "state",
+                                                                            "street_address"
+                                                                        ]
+                                                                    }
+                                                                ]
                                                             }
-                                                        },
-                                                        "required": [
-                                                            "city",
-                                                            "state",
-                                                            "street_address"
-                                                        ]
+                                                        }
                                                     }
-                                                }
+                                                ]
                                             }
+                                        },
+                                        "required": [
+                                            "firstName",
+                                            "lastName"
                                         ]
                                     }
-                                },
-                                "required": [
-                                    "firstName",
-                                    "lastName"
                                 ]
                             }
                         }
