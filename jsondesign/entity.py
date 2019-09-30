@@ -4,6 +4,7 @@ TODO: The Entity library
 """
 
 import json
+from . import utils
 
 SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
@@ -59,21 +60,25 @@ class Object(Entity):
 
     def get_features(self):
         """
-        Return objects features
+        Return objects features (local)
         """
         features = dict()
         for feature in self.schema['allOf'][0]['properties']['features']['allOf'][0]['properties']:
             features[feature] = self.schema['allOf'][0]['properties']['features']['allOf'][0]['properties'][feature]
         return features
 
-    def get_features_paths(self):
+    def get_features_paths(self, schema_store):
+        """
+        Return a list of schema paths (also if inherited)
+        """
+        dereferenced_schema = self.dereference(schema_store)
+        return utils.explore_paths(dereferenced_schema)
 
-        features_hierarchy = list()
-        dereferenced_schema = self.dereference()
-
-        return features_hierarchy
 
     def set_feature(self, **kwargs):
+        """
+        Set a local feature
+        """
         for key, value in kwargs.items():
             if type(value) == ObjectReference:
                 new_data = value
@@ -82,7 +87,11 @@ class Object(Entity):
 
             self.schema['allOf'][0]['properties']['features']['allOf'][0]['properties'][key] = new_data
 
+
     def remove_features(self, *args):
+        """
+        Remove a local feature
+        """
 
         for f in args:
             try:
@@ -94,11 +103,14 @@ class Object(Entity):
 
     def get_required_features(self):
         """
-        Return a list of required properties
+        Return a list of (locally) required properties
         """
         return self.schema['allOf'][0]['properties']['features']['allOf'][0]['required']
 
     def add_required_features(self, *args):
+        """
+        Add a (locally) required properties
+        """
 
         required = self.schema['allOf'][0]['properties']['features']['allOf'][0]['required']
 
@@ -110,6 +122,9 @@ class Object(Entity):
             list(set(required)))
 
     def remove_required_features(self, *args):
+        """
+        Remove a (locally) required properties
+        """
 
         required = self.schema['allOf'][0]['properties']['features']['allOf'][0]['required']
 

@@ -11,7 +11,7 @@ import copy
 def custom_retrieval_function(uri):
         return copy.deepcopy(next(item for item in SCHEMA if item["$id"] == uri))
 
-schema_store = Schema_Store(getter = custom_retrieval_function)
+schema_store = Schema_Store(getter = custom_retrieval_function, saver = None)
 
 
 

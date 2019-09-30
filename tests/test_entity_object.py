@@ -84,6 +84,17 @@ def test_get_required_features(schema_store):
     assert student.get_required_features() == ["student_id"]
 
 
+def test_get_features_paths(schema_store):
+    student = schema_store.get_object('las://schema/student')
+    assert student.get_features_paths(schema_store) == [{'features.student_id': 'string'},
+ {'features.firstName': 'string'},
+ {'features.lastName': 'string'},
+ {'features.address.features.street_address': 'string'},
+ {'features.address.features.city': 'string'},
+ {'features.address.features.state': 'string'}]
+
+
+
 """
 
 Modify existing objects

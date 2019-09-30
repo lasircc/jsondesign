@@ -2,30 +2,48 @@
 Library utils
 """
 
+import json
 
-def explore_paths(schema):
+
+def explore_paths(schema, root = None):
     """
     Explore a schema and extract its features path recursively
     """
-    print('\n\n_______Foo_______\n')
 
-    # Get current schema
-    #print(schema)
-
+    return_list = list()
+    
     properties = schema['allOf'][0]['properties']
 
     for k in properties:
-        print(k)
-        print (properties[k])
  
-        if type(properties[k]) == dict: # do not explore list of required properties
-     
-            a = {k: properties[k]['type'] }
-            print(a)
-            if properties[k]['type'] == 'object':
-                return explore_paths(properties[k])
+        """
+        Here type(properties[k]) == dict does not work for referenced schemata. 
+        Indeed, the type of a referenced schema is jsonref.JsonRef, 
+        even if it is rendered and it acts as a dict.
+        Une isinstance instead
+        """
+        if isinstance(properties[k], dict): # do not explore lists of required properties 
+       
+            if root:
+                key = root+'.'+k
+            else:
+                key = k
 
-            
+            if properties[k]['type'] == 'object':
+                data = explore_paths(properties[k],root=key)
+                return_list += data
+            else:
+                return_list.append({key: properties[k]["type"]})
+
+    extensions = schema['allOf'][1:]
+
+    for c in extensions:
+        data =  explore_paths(c,root=root)
+        return_list += data
+    
+    # TODO: remove possible duplications due to bad modeling
+    return return_list
+           
 
 
 
@@ -122,4 +140,10 @@ foo = {
 }
 
 
-explore_paths(foo)
+
+def main():
+    return explore_paths(foo)
+
+if __name__ == "__main__":
+    paths = main()
+    print (json.dumps(paths, sort_keys=True, indent=4))
