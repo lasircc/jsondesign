@@ -31,7 +31,9 @@ class Object(Entity):
     Pythonic representation of a Complex Object
     """
 
-    def __init__(self, schema=None, uri=None):
+    def __init__(self, schema=None, uri=None, features_key = 'features'):
+        # Set a custom features key
+        self.features_key = features_key
         if schema:
             super().__init__(schema=schema, type='object')
         else:
@@ -42,7 +44,7 @@ class Object(Entity):
             s['allOf'] = list()
             object_properties = {
                 "properties": {
-                    'features': {
+                    self.features_key : {
                         "type": "object",
                         "allOf": [
                             {
@@ -63,8 +65,8 @@ class Object(Entity):
         Return objects features (local)
         """
         features = dict()
-        for feature in self.schema['allOf'][0]['properties']['features']['allOf'][0]['properties']:
-            features[feature] = self.schema['allOf'][0]['properties']['features']['allOf'][0]['properties'][feature]
+        for feature in self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties']:
+            features[feature] = self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties'][feature]
         return features
 
     def get_features_paths(self, schema_store):
@@ -85,7 +87,7 @@ class Object(Entity):
             else:
                 new_data = value.schema
 
-            self.schema['allOf'][0]['properties']['features']['allOf'][0]['properties'][key] = new_data
+            self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties'][key] = new_data
 
 
     def remove_features(self, *args):
@@ -95,7 +97,7 @@ class Object(Entity):
 
         for f in args:
             try:
-                del self.schema['allOf'][0]['properties']['features']['allOf'][0]['properties'][f]
+                del self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties'][f]
                 self.remove_required_features(f)
             except KeyError:
                 pass
@@ -105,20 +107,20 @@ class Object(Entity):
         """
         Return a list of (locally) required properties
         """
-        return self.schema['allOf'][0]['properties']['features']['allOf'][0]['required']
+        return self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required']
 
     def add_required_features(self, *args):
         """
         Add a (locally) required properties
         """
 
-        required = self.schema['allOf'][0]['properties']['features']['allOf'][0]['required']
+        required = self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required']
 
         for f in args:
             required.append(f)
 
         # remove duplicates and sort
-        self.schema['allOf'][0]['properties']['features']['allOf'][0]['required'] = sorted(
+        self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required'] = sorted(
             list(set(required)))
 
     def remove_required_features(self, *args):
@@ -126,7 +128,7 @@ class Object(Entity):
         Remove a (locally) required properties
         """
 
-        required = self.schema['allOf'][0]['properties']['features']['allOf'][0]['required']
+        required = self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required']
 
         if args:
             for f in args:
@@ -137,7 +139,7 @@ class Object(Entity):
                     # print(f'{f} is ignored since it is not a current feature of this object')
 
         # sort
-        self.schema['allOf'][0]['properties']['features']['allOf'][0]['required'] = sorted(
+        self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required'] = sorted(
             required)
 
     def dereference(self, schema_store):

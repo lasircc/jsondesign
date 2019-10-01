@@ -21,6 +21,40 @@ def test_create_object():
         item for item in SCHEMA if item["$id"] == 'las://schema/address')
 
 
+
+def test_create_object_with_custom_features_field():
+    """
+    Create an object representation of an Address
+    """
+    e = ey.Object(uri='las://schema/foo', features_key='foobarbaz')
+    simple_string = ey.String()
+    custom_features = {'bar': simple_string}
+    e.set_feature(**custom_features)
+
+    assert e.schema == {
+        "$id": "las://schema/foo",
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "allOf": [
+            {
+                "properties": {
+                    'foobarbaz': {
+                        "type": "object",
+                        "allOf": [
+                            {
+                                "properties": {
+                                    "bar": {"type": "string"}
+                                },
+                                "required": []
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+
+
 def test_append_reference():
     """
     Create a reference and append it to an object
