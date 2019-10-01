@@ -33,7 +33,7 @@ class Object(Entity):
 
     def __init__(self, schema=None, uri=None, features_key = 'features'):
         # Set a custom features key
-        self.features_key = features_key
+        self.features_key = features_key.replace(" ","_")
         if schema:
             super().__init__(schema=schema, type='object')
         else:
