@@ -57,8 +57,10 @@ class Object(Entity):
             }
             s['allOf'].append(object_properties)
 
+
     def __repr__(self):
         return f"<Pythonic Object representation of {self.schema['$id']})>"
+
 
     def get_features(self):
         """
@@ -68,6 +70,7 @@ class Object(Entity):
         for feature in self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties']:
             features[feature] = self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties'][feature]
         return features
+
 
     def get_features_paths(self, schema_store):
         """
