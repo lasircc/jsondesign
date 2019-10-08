@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 setup(
     name="jsondesign",
     version="0.1.0",
-    description="A Python 3 library handling JSON schema for mimicking entities design in an OO-fashions",
+    description="A Python 3 library handling JSON schema for mimicking entities design in an OO-fashion",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/lasircc/jsondesign",
