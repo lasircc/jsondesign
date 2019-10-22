@@ -13,6 +13,8 @@ def explore_paths(schema, root = None):
     return_list = list()
     
     properties = schema['allOf'][0]['properties']
+    
+    required = schema['allOf'][0].get('required') or list()
 
     for k in properties:
  
@@ -29,20 +31,30 @@ def explore_paths(schema, root = None):
             else:
                 key = k
 
+            #else:
+            path = {"path" : key, 'type' : properties[k]["type"]}
+            if k in required:
+                path['required'] = True
+
+            return_list.append(path)
+
             if properties[k]['type'] == 'object':
-                data = explore_paths(properties[k],root=key)
-                return_list += data
-            else:
-                return_list.append({key: properties[k]["type"]})
+                return_list += explore_paths(properties[k],root=key)
 
     extensions = schema['allOf'][1:]
 
     for c in extensions:
         data =  explore_paths(c,root=root)
-        return_list += data
+        
+        # now we need to check if an item is already in the return_list
+        # E.g., you don't want to add {"features": "object"} twice
+        for item in data:
+            if item not in return_list:
+                return_list.append(item)
     
     # TODO: remove possible duplications due to bad modeling
     return return_list
+    #return [dict(t) for t in {tuple(d.items()) for d in return_list}]
            
 
 
