@@ -42,19 +42,31 @@ class Object(Entity):
             s['$schema'] = SCHEMA_VERSION
             s['$id'] = uri
             s['allOf'] = list()
-            object_properties = {
-                "properties": {
-                    self.features_key : {
-                        "type": "object",
-                        "allOf": [
-                            {
-                                "properties": {},
-                                "required": []
-                            }
-                        ]
+            if self.features_key != '':
+                object_properties = {
+                    "properties": {
+                        self.features_key : {
+                            "type": "object",
+                            "allOf": [
+                                {
+                                    "properties": {},
+                                    "required": []
+                                }
+                            ]
+                        }
                     }
                 }
-            }
+            else:
+                object_properties = {
+                    "properties": {
+                        "allOf": [
+                                {
+                                    "properties": {},
+                                    "required": []
+                                }
+                            ]
+                    }
+                }
             s['allOf'].append(object_properties)
 
 
@@ -67,8 +79,12 @@ class Object(Entity):
         Return objects features (local)
         """
         features = dict()
-        for feature in self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties']:
-            features[feature] = self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties'][feature]
+        if self.features_key != '':
+            for feature in self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties']:
+                features[feature] = self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties'][feature]
+        else:
+            for feature in self.schema['allOf'][0]['properties']['allOf'][0]['properties']:
+                features[feature] = self.schema['allOf'][0]['properties'][feature]
         return features
 
 
@@ -89,8 +105,10 @@ class Object(Entity):
                 new_data = value
             else:
                 new_data = value.schema
-
-            self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties'][key] = new_data
+            if self.features_key != '':
+                self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties'][key] = new_data
+            else:
+                self.schema['allOf'][0]['properties'][key] = new_data
 
 
     def remove_features(self, *args):
@@ -100,7 +118,10 @@ class Object(Entity):
 
         for f in args:
             try:
-                del self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties'][f]
+                if self.features_key != '':
+                    del self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['properties'][f]
+                else:
+                    del self.schema['allOf']['properties'][f]
                 self.remove_required_features(f)
             except KeyError:
                 pass
@@ -110,21 +131,30 @@ class Object(Entity):
         """
         Return a list of (locally) required properties
         """
-        return self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required']
+        if self.features_key != '':
+            return self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required']
+        else:
+            return self.schema['allOf'][0]['properties']['required']
 
     def add_required_features(self, *args):
         """
         Add a (locally) required properties
         """
-
-        required = self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required']
+        if self.features_key != '':
+            required = self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required']
+        else:
+            required = self.schema['allOf'][0]['required']
 
         for f in args:
             required.append(f)
 
         # remove duplicates and sort
-        self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required'] = sorted(
-            list(set(required)))
+        if self.features_key != '':
+            self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required'] = sorted(
+                list(set(required)))
+        else:
+            self.schema['allOf'][0]['required'] = sorted(
+                list(set(required)))
 
     def remove_required_features(self, *args):
         """
@@ -142,8 +172,12 @@ class Object(Entity):
                     # print(f'{f} is ignored since it is not a current feature of this object')
 
         # sort
-        self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required'] = sorted(
-            required)
+        if self.features_key != '':
+            self.schema['allOf'][0]['properties'][self.features_key]['allOf'][0]['required'] = sorted(
+                required)
+        else:
+            self.schema['allOf'][0]['required'] = sorted(
+                required)
 
     def dereference(self, schema_store):
         """
