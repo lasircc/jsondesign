@@ -31,7 +31,7 @@ class Object(Entity):
     Pythonic representation of a Complex Object
     """
 
-    def __init__(self, schema=None, uri=None, features_key = 'features'):
+    def __init__(self, schema=None, uri=None, features_key = ''):
         # Set a custom features key
         self.features_key = features_key.replace(" ","_")
         if schema:
